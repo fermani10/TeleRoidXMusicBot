@@ -1,7 +1,7 @@
-"""Download music from YouTube/SoundCloud/Mixcloud, convert thumbnail
-to square thumbnail and upload to Telegram
+"""Download Music From YouTube/SoundCloud/Mixcloud, Convert
+Thumbnail To Square Thumbnail And Upload To Telegram
 
-Send a link as a reply to bypass Music category check
+Send A Link As A Reply To Bypass Music Category Check!
 
 # requirements.txt
 OpenCC
@@ -16,8 +16,8 @@ MUSIC_CHATS = [
 MUSIC_USERS = [1234567890]
 MUSIC_DELAY_DELETE_INFORM = 10
 MUSIC_INFORM_AVAILABILITY = (
-    "This bot only serves the specified group and"
-    "its members in private chat"
+    "This is YouTube Music Downloader Bot"
+    "For The Members of @TeleRoid14 Group🔥"
 )
 MUSIC_MAX_LENGTH = 10800
 
@@ -27,7 +27,7 @@ import asyncio
 from datetime import timedelta
 from urllib.parse import urlparse
 from pyrogram import Client, filters, idle
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from youtube_dl import YoutubeDL
 from PIL import Image
 import ffmpeg
@@ -76,10 +76,44 @@ main_filter = (
     & ~filters.edited
 )
 
+@app.on_message(
+    filters.command("start")
+    & filters.private
+    & ~ filters.edited
+)
+async def start_(client: Client, message: Message):
+    await message.reply_text(
+        f"""<b>👋🏻 Hi {message.from_user.first_name} !!</b>
 
+🌀 My Name Is **𝙼𝚞𝚜𝚒𝚌 𝙱𝚘𝚝** 🎵 
+
+🌀 I Only Works In **Lɪᴠᴇ Mᴜꜱɪᴄ** 🎧 
+
+🌀 I Can **Download Music** From **YouTube!**
+
+🌀 Send Any **YouTube Link** To **Play** In Group!""",
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "⭕ Channel ⭕", url="https://t.me/TeleRoidGroup"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "⭕ Support ⭕", url="https://t.me/TeleRoid14"
+                    ),
+                    InlineKeyboardButton(
+                        "👨‍💻 Developer 👨‍💻", url="https://t.me/PredatorHackerzZ_bot"
+                    )
+                ]
+            ]
+        )
+    )
+    
 @app.on_message(main_filter & filters.regex("^/ping$"))
 async def ping_pong(_, message):
-    await _reply_and_delete_later(message, "pong",
+    await _reply_and_delete_later(message, "pong😂",
                                   DELAY_DELETE_INFORM)
 
 
@@ -103,21 +137,21 @@ async def _fetch_and_send_music(message: Message):
         # send a link as a reply to bypass Music category check
         if not message.reply_to_message \
                 and _youtube_video_not_music(info_dict):
-            inform = ("This video is not under Music category, "
-                      "you can resend the link as a reply "
-                      "to force download it")
+            inform = ("This Video is Not Under Music Category, "
+                      "You Can Resend The Link As Reply "
+                      "To Force Download & Play It !!😁")
             await _reply_and_delete_later(message, inform,
                                           DELAY_DELETE_INFORM)
             return
         if info_dict['duration'] > MUSIC_MAX_LENGTH:
             readable_max_length = str(timedelta(seconds=MUSIC_MAX_LENGTH))
-            inform = ("This won't be downloaded because its audio length is "
-                      "longer than the limit `{}` which is set by the bot"
+            inform = ("This Won't Be Downloaded Because Its Audio Length is "
+                      "Longer Than The Limit `{}` Which is Set By The Owner😴"
                       .format(readable_max_length))
             await _reply_and_delete_later(message, inform,
                                           DELAY_DELETE_INFORM)
             return
-        d_status = await message.reply_text("Downloading...", quote=True,
+        d_status = await message.reply_text("Uploading Music...🔊", quote=True,
                                             disable_notification=True)
         ydl.process_info(info_dict)
         audio_file = ydl.prepare_filename(info_dict)
@@ -165,9 +199,9 @@ async def _upload_audio(message: Message, info_dict, audio_file):
     make_squarethumb(thumbnail_file, squarethumb_file)
     webpage_url = info_dict['webpage_url']
     title = info_dict['title']
-    caption = f"<b><a href=\"{webpage_url}\">{title}</a></b>"
+    caption = f"<b>✣ Music: <a href=\"{webpage_url}\">{title}</a></b> \n✣ **Uploaded By: [TeleRoid](https://t.me/TeleRoid14)** 🎶 "
     duration = int(float(info_dict['duration']))
-    performer = info_dict['uploader']
+    performer = f"[ꜱᴀꜰᴏɴᴇ ᴍᴜꜱɪᴄ]" 
     await message.reply_audio(audio_file,
                               caption=caption,
                               duration=duration,
@@ -186,7 +220,7 @@ def _get_file_extension_from_url(url):
 
 
 def make_squarethumb(thumbnail, output):
-    """Convert thumbnail to square thumbnail"""
+    """Convert Thumbnail To Square Thumbnail"""
     # https://stackoverflow.com/a/52177551
     original_thumb = Image.open(thumbnail)
     squarethumb = _crop_to_square(original_thumb)
